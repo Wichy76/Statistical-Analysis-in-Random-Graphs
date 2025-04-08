@@ -1,7 +1,7 @@
 set.seed(3)
 
 # Tamaño de las muestras
-b = 1000
+b = 200
 
 l = 200   # n/k
 # Tamaño de los grafos
