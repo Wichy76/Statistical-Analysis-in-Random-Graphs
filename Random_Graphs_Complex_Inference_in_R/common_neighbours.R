@@ -1,4 +1,4 @@
-
+ 
 g <- graph
 
 neighbors_list <- adjacent_vertices(g, V(g))
