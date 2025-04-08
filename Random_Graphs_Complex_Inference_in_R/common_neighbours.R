@@ -19,10 +19,20 @@ for (i in 1:(n-1)) {
   }
 }
 
+main_title <- sprintf("Distribución de vecinos comunes entre pares de nodos\n con pesos (1/2, 1/4, 1/8, 1/56 ..., 1/56)/m \n cov = diag(%d), n = %d, m=%d, p=%d", sigma, n, m, p)
+
 # Hacer histograma
 hist(common_counts,
-     main = "Distribución de vecinos comunes entre pares de nodos",
+     main = main_title,
      xlab = "Número de vecinos comunes",
      ylab = "Frecuencia",
      col = "steelblue",
      breaks = max(common_counts) + 1)
+
+
+pdf("test.pdf", width = 40, height = 40, bg = "white")  # bg puede ser "transparent"
+plot(graph, vertex.size = 0.5, vertex.color = rgb(0, 0, 0, alpha = 1),
+     vertex.frame.color = NA, edge.color = rgb(0, 0, 0, alpha = 0.2), edge.width = 0.7,
+     vertex.label = NA, margins = 0,, main= main_title)
+
+dev.off()  # Cerrar PDF

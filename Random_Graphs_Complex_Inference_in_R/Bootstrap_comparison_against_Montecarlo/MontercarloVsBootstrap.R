@@ -9,7 +9,7 @@ k <- 65
 n = k*l
 
 # Parámetros de las distribuciones
-sigma = 1000
+sigma = 100
 m = 10
 p = m
 mu <- numeric(p - 1)
@@ -67,7 +67,7 @@ diferences <- model_stats - bootstrap_stats
 # ---------------------------
 # Step 5: Plot both distributions for the value of n
 
-main_title <- sprintf("Bootstrap vs. Model-based simulation\nn = %d, k = %d, b = %d, n/k = %d", n, k, b, l)
+main_title <- sprintf("Bootstrap vs. Model-based simulation\n n = %d, k = %d, b = %d, n/k = %d", n, k, b, l)
 
 hist(bootstrap_stats, col = "gray", 
      main = main_title,
