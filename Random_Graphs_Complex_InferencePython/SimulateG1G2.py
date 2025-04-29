@@ -91,7 +91,7 @@ def simulate_or_load(path, params, force=False):
 if __name__=="__main__":
     cache_file = 'simulated_graphs.pkl'
     params = (
-        1000,    # n
+        10,    # n
         26,      # p
         1e5,     # sigma1
         50,      # m1

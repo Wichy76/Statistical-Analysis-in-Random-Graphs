@@ -67,10 +67,17 @@ if __name__=='__main__':
     # — 1) Simula o carga tus grafos G1, G2
     cache = 'simulated_graphs.pkl'
     params = (
-      500, 26, 1e5, 50, [1/50]*50,
-      1e5, 50, [1/50]*50, 42
+        500,    # n
+        26,      # p
+        1e5,     # sigma1
+        50,      # m1
+        [1/50]*50,
+        1e5,     # sigma2
+        4,      # m2
+        [1/4]*4,
+        42       # seed
     )
-    G1, G2 = SimulateG1G2.simulate_or_load(cache, params, force=False)
+    G1, G2 = SimulateG1G2.simulate_or_load(cache, params, force=True)
 
     # — 2) Bootstrap en G1
     b = 200
