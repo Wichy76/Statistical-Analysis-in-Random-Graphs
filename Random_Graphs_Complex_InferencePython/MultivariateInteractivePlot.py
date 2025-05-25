@@ -16,6 +16,35 @@ import SimulateG1G2              # tu módulo con simulate_or_load()
 from sklearn.covariance import EllipticEnvelope
 from scipy.stats import chi2
 import plotly.graph_objs as go
+import community as community_louvain
+from scipy.stats import gaussian_kde
+
+np.random.seed(42+8)
+
+def sample_common_counts(G, S):
+    """
+    Muestrea S pares (i<j) de nodos *sin* reemplazo y calcula el número de vecinos comunes.
+    Devuelve un array de longitud S.
+    """
+    nodes = list(G.nodes())
+    n = len(nodes)
+    counts = np.empty(S, dtype=int)
+    seen = set()
+    k = 0
+    while k < S:
+        i, j = np.random.choice(n, 2, replace=False)
+        if i > j:
+            i, j = j, i
+        if (i,j) in seen:
+            continue
+        seen.add((i,j))
+        # vecinos comunes:
+        ni = set(G.neighbors(nodes[i]))
+        nj = set(G.neighbors(nodes[j]))
+        counts[k] = len(ni & nj)
+        k += 1
+    return counts
+
 
 def normalized_triangles(G):
     """Número de triángulos normalizado en [0,1]."""
@@ -28,20 +57,53 @@ def compute_stats_subgraph(G, k):
     """Devuelve el triplete (f1,f2,f3) de un subgrafo aleatorio de k vértices."""
     nodes = np.random.choice(list(G), k, replace=False)
     sub = G.subgraph(nodes)
-    # f1 = assortativity
-    a = nx.degree_assortativity_coefficient(sub)
-    f1 = 0.0 if np.isnan(a) else a
+    # f1 = common_neighbours subsampled
+    S = min(10000, n*(n-1)//2)
+    common_sampled = sample_common_counts(sub, S) 
+    xmin, xmax = 0, max(common_sampled.max(), common_sampled.max())
+    xs = np.linspace(xmin, xmax, 1000)
+
+    kde1_sampled = gaussian_kde(common_sampled)
+    dens1 = kde1_sampled(xs)
+    dx = xs[1] - xs[0]
+    L1_approx  = np.sum(np.abs(dens1)) * dx
+    Linf_approx = np.max(np.abs(dens1))
+    f1 = L1_approx / Linf_approx if Linf_approx > 0 else 0.0
     # f2 = distancia media (sobre componente gigante)
-    if nx.is_connected(sub):
-        lengths = dict(nx.all_pairs_shortest_path_length(sub))
-        dists = [d for u in lengths for v,d in lengths[u].items() if u<v]
-    else:
-        comp = max(nx.connected_components(sub), key=len)
-        lengths = dict(nx.all_pairs_shortest_path_length(sub.subgraph(comp)))
-        dists = [d for u in lengths for v,d in lengths[u].items() if u<v]
-    f2 = np.mean(dists) if dists else 0.0
+    partition = community_louvain.best_partition(sub)
+    f2 = community_louvain.modularity(partition, sub)
     # f3 = triángulos normalizados
+    f3 = normalized_triangles(sub)* 15 if sub.number_of_edges()>0 else 0.0
+    return np.array([f1, f2, f3])
+
+def compute_stats_subgraph_fast(G, k):
+    # 1) extraemos subgrafo y su matriz
+    nodes = np.random.choice(list(G), k, replace=False)
+    A = nx.to_numpy_array(G.subgraph(nodes), dtype=int)  # k×k
+
+    # 2) producto matricial para vecinos comunes
+    common_mat = A.dot(A)                              # O(k^3)
+
+    # 3) histogram de los C(k,2) conteos
+    iu = np.triu_indices(k, k=1)
+    common_counts = common_mat[iu]                     # O(k^2)
+
+    # 4) KDE & L1/L∞
+    xs = np.linspace(0, common_counts.max(), 1000)
+    dens = gaussian_kde(common_counts)(xs)
+    dx  = xs[1] - xs[0]
+    L1  = np.sum(np.abs(dens))*dx
+    Linf= np.max(np.abs(dens))
+    f1 = L1 / Linf if Linf>0 else 0.0
+
+    # 5) modularidad
+    sub = G.subgraph(nodes)
+    partition = community_louvain.best_partition(sub)
+    f2 = community_louvain.modularity(partition, sub)
+
+    # 6) triángulos normalizados
     f3 = normalized_triangles(sub) if sub.number_of_edges()>0 else 0.0
+
     return np.array([f1, f2, f3])
 
 def fit_mve_ee(S):
@@ -66,15 +128,20 @@ def test_point(ee, stat2, d):
 if __name__=='__main__':
     # — 1) Simula o carga tus grafos G1, G2
     cache = 'simulated_graphs.pkl'
+    n = 500
+    p = n//20 + 1
+    sigma   = 1e5
+    m1= 25  
+    m2 = 33
     params = (
-        500,    # n
-        26,      # p
+        n,    
+        p,     
         1e5,     # sigma1
-        50,      # m1
-        [1/50]*50,
+        m1,      # m1
+        [1/m1]*m1,
         1e5,     # sigma2
-        4,      # m2
-        [1/4]*4,
+        m2,      # m2
+        [1/m2]*m2,
         42       # seed
     )
     G1, G2 = SimulateG1G2.simulate_or_load(cache, params, force=True)
@@ -83,7 +150,7 @@ if __name__=='__main__':
     b = 200
     n = G1.number_of_nodes()
     k = int(round(n**(2/3)))
-    S = np.vstack([ compute_stats_subgraph(G1,k) for _ in range(b) ])
+    S = np.vstack([ compute_stats_subgraph_fast(G1,k) for _ in range(b) ])
 
     # — 3) Ajusta elipsoidEE al 95%
     ee, center, cov = fit_mve_ee(S)
@@ -140,8 +207,8 @@ if __name__=='__main__':
     fig.update_layout(
       title=f"Test MVE 95% (EllipticEnvelope) — H₀ {'ACEPTADA' if accept else 'RECHAZADA'}",
       scene = dict(
-        xaxis_title='f1: assort',
-        yaxis_title='f2: avgDist',
+        xaxis_title='f1',
+        yaxis_title='f2: modularidad',
         zaxis_title='f3: triNorm',
         camera = dict(eye=dict(x=1.3,y=1.3,z=0.8))
       ),

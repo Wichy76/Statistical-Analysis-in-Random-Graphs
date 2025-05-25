@@ -6,7 +6,7 @@ from scipy.linalg import null_space
 import os
 
 # Ruta donde se guardarán las imágenes
-output_dir = r"C:\Users\tejon\Documents\Statistical-Analysis-in-Random-Graphs\Random_Graphs_Complex_Inference_in_R\tests"
+output_dir = r"C:\Users\tejon\Documents\Statistical-Analysis-in-Random-Graphs\Tests\triangles"
 os.makedirs(output_dir, exist_ok=True)
 
 def calculate_inverse_projection(u, p):
@@ -93,14 +93,16 @@ def run_experiments():
     trials = 30
 
     for n in ns:
-        p = int(2.5*np.sqrt(n)) + 2
+        p = n//20 + 1
         m_opts = [max(2,n//20), max(3,n//15), max(4,n//10)]
-        fig, axs = plt.subplots(6,5,figsize=(15,18))
+        
+        fig, axs = plt.subplots(6,5,figsize=(18,11))
         axs = axs.flatten()
         fp = fn = 0
         idx = 0
 
         for i in range(trials):
+            np.random.seed(42+i)
             m1 = np.random.choice(m_opts)
             m2 = m1 if i<trials//2 else np.random.choice([m for m in m_opts if m!=m1])
             w1 = [1/m1]*m1
@@ -113,8 +115,8 @@ def run_experiments():
             axs[idx].set_title(f"m1={m1}, m2={m2}", fontsize=7)
             idx += 1
 
-            if m1==m2 and rejected:    fp += 1
-            if m1!=m2 and not rejected: fn += 1
+            if m1==m2 and rejected:    fn += 1
+            if m1!=m2 and not rejected: fp += 1
 
         plt.tight_layout(); plt.subplots_adjust(top=0.92)
         plt.suptitle(f"[Triangles] n={n}, {trials} pruebas", fontsize=14)

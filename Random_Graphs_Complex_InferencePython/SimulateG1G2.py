@@ -84,7 +84,6 @@ def simulate_or_load(path, params, force=False):
         G2 = generate_test_graph(n,p,sigma2,m2,weights2, seed=seed+1)
         with open(path,'wb') as f:
             pickle.dump((G1,G2), f)
-        print("Grafos simulados y guardados.")
     return G1, G2
 
 
@@ -101,7 +100,7 @@ if __name__=="__main__":
         [1/45]*45,
         42       # seed
     )
-    G1, G2 = simulate_or_load(cache_file, params, force=False)
+    G1, G2 = simulate_or_load(cache_file, params, force=True)
 
     #Visualización
     fig, axs = plt.subplots(1, 2, figsize=(12, 6))
