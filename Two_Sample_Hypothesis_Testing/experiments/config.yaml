@@ -1,0 +1,3 @@
+dataset_path: data/vary_num_communities/n1000
+stat_names: ["f1", "f2"]
+create_images: true

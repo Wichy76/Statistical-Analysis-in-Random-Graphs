@@ -1,11 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-import SimulateG1G2              # tu módulo con simulate_or_load()
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import Random_Graphs_Complex_InferencePython.RSG_simulation.SimulateG1G2 as SimulateG1G2              # tu módulo con simulate_or_load()
 from sklearn.covariance import EllipticEnvelope
 from scipy.stats import chi2
 import community as community_louvain
-import os
+
 
 # Ruta donde se guardarán las imágenes
 output_dir = r"C:\Users\tejon\Documents\Statistical-Analysis-in-Random-Graphs\Tests\CN_Linf+AvgDist+Triangles"

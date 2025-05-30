@@ -12,7 +12,7 @@ test_mv_elliptic_envelope.py
 
 import numpy as np
 import networkx as nx
-import SimulateG1G2              # tu módulo con simulate_or_load()
+import Random_Graphs_Complex_InferencePython.RSG_simulation.SimulateG1G2 as SimulateG1G2              # tu módulo con simulate_or_load()
 from sklearn.covariance import EllipticEnvelope
 from scipy.stats import chi2
 import plotly.graph_objs as go

@@ -7,7 +7,7 @@ from scipy.stats import gaussian_kde
 import community as community_louvain  # algoritmo de Louvain
 
 # Importamos sólo la función de carga de grafos simulados
-from SimulateG1G2 import simulate_or_load
+from Random_Graphs_Complex_InferencePython.RSG_simulation.SimulateG1G2 import simulate_or_load
 
 # ------------------------
 # Estadístico de triángulos normalizado
