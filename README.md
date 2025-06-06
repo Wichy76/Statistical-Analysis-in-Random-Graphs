@@ -98,7 +98,7 @@ Each script controls one experimental dimension: number of communities, weight b
 
 This codebase supports the empirical component of the thesis:
 
-> **Pruebas de hipótesis no paramétricas para redes complejas**  
+> **Pruebas de hipótesis no paramétricas para el problema de dos muestras de redes complejas**  
 > Undergraduate thesis in mathematics, Universidad de loa Andes de Colombia  
 > Author: Luis Ernest Tejón Rojas
 > Advisor: Adolfo Quiroz
