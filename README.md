@@ -98,9 +98,10 @@ Each script controls one experimental dimension: number of communities, weight b
 
 This codebase supports the empirical component of the thesis:
 
-> **Non-parametric Two-Sample Hypothesis Testing for Random Graphs with Latent Geometry**  
+> **Pruebas de hipótesis no paramétricas para redes complejas**  
 > Undergraduate thesis in mathematics, Universidad de loa Andes de Colombia  
-> Author: Luis Tejón
+> Author: Luis Ernest Tejón Rojas
+> Advisor: Adolfo Quiroz
 
 For full theoretical context, methodology, and mathematical background, refer to the compiled thesis PDF.
 
