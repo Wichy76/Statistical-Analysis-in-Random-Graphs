@@ -1,3 +1,5 @@
-dataset_path: data/vary_num_communities/n1000
-stat_names: ["f1", "f2"]
+dataset_path: data/vary_all/n2000
+stat_names: ["f2", "f4"]
 create_images: true
+num_workers: 12 
+n_trials: 10

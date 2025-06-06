@@ -1,0 +1,62 @@
+# datasets_simulation/vary_num_communities_ruido.py
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+import pickle
+import numpy as np
+from tqdm import tqdm
+from core.generators import generate_mixture_sphere_sample, generate_random_spherical_graph
+
+def create_basis_u_list(p, m):
+    basis = [np.eye(p)[i] for i in range(p)]
+    u_list = []
+    i = 0
+    while len(u_list) < m:
+        u_list.append(basis[i % p])
+        if len(u_list) < m:
+            u_list.append(-basis[i % p])
+        i += 1
+    return u_list
+
+def generate_graph_instance(n, m, seed):
+    np.random.seed(seed)
+    p = int(n / 2 + 1)
+    mu = np.zeros(p - 1)
+
+    # m comunidades + 1 fuente de ruido
+    u_list = create_basis_u_list(p, m)
+    noise_direction = np.random.normal(size=p)
+    noise_direction /= np.linalg.norm(noise_direction)
+    u_list.append(noise_direction)
+
+    # pesos: m uniformes + 1 ruido con poco peso
+    weights = [1 / m * 0.95 for _ in range(m)]
+    weights.append(0.05)  # 5% de ruido
+    weights = np.array(weights) / np.sum(weights)  # normalizar
+
+    # m sigmas regulares + 1 sigma ruidosa
+    Sigmas = [np.diag([1 / (5 * p)] * (p - 1)) for _ in range(m)]
+    Sigmas.append(np.identity(p - 1))  # ruido con varianza alta
+
+    X = generate_mixture_sphere_sample(mu, Sigmas, u_list, weights, n)
+    G = generate_random_spherical_graph(X)
+    return G, {"n": n, "p": p, "m": m, "seed": seed, "noise": True}
+
+def save_graph(G, metadata, folder, idx):
+    os.makedirs(folder, exist_ok=True)
+    path = os.path.join(folder, f"graph_{idx:03d}.pkl")
+    with open(path, "wb") as f:
+        pickle.dump({"graph": G, "metadata": metadata}, f)
+
+def generate_dataset_for_n(n, num_graphs=50):
+    possible_ms = [1, 2, 3, 4, 6, 8, 10, 12, 15, 18, 21, 24, 28, 32, 36, 40, 45, 50, 55, 60, 66, 72, 78, 84, 91, 98, 105, 112, 120, 128]
+    folder = f"data/vary_num_communities_ruido/n{n}"
+    for i in tqdm(range(num_graphs)):
+        m = np.random.choice(possible_ms)
+        G, metadata = generate_graph_instance(n, m, seed=3000 * n + i)
+        metadata["dataset_type"] = "vary_num_communities_ruido"
+        save_graph(G, metadata, folder, i)
+
+if __name__ == "__main__":
+    for n in [2000]:
+        generate_dataset_for_n(n)

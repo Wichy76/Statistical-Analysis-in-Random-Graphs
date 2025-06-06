@@ -86,21 +86,24 @@ def simulate_or_load(path, params, force=True):
             pickle.dump((G1,G2), f)
     return G1, G2
 
-n=500
+n=2000
 p = int(n / 2 + 1)  # p es la dimensión del espacio
-i = 8
+i = 0
 possible_ms = [1, 2, 3, 4, 6, 8, 10, 12, 15, 18]
-m1 = possible_ms[i]
-m2 = possible_ms[i+1]
+m1 = 15
+m2 = 15
+possible_sigmas = [3*p, 5*p, 7*p, 9*p, 11*p, 13*p, 15*p, 17*p, 19*p, 21*p, 23*p, 25*p, 27*p, 29*p, 31*p, 33*p, 35*p, 37*p, 39*p, 41*p, 43*p, 45*p]
+sigma1 = possible_sigmas[i]
+sigma2 = possible_sigmas[i+1]
 if __name__=="__main__":
     cache_file = 'simulated_graphs.pkl'
     params = (
         n,    # n
         p,      # p
-        10*p,     # sigma1
+        sigma1,     # sigma1
         m1,      # m1
         [1/m1]*m1,
-        10*p,     # sigma2
+        sigma2,     # sigma2
         m2,      # m2
         [1/m2]*m2,
         42       # seed

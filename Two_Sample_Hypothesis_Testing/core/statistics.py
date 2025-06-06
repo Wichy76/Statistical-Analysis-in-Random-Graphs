@@ -37,6 +37,20 @@ def common_neighbor_density(G, num_samples=10000):
         k += 1
     return kde_l1_linf_ratio(np.array(counts))
 
+import numpy as np
+import networkx as nx
+
+def energia_normalizada(G):
+    n = G.number_of_nodes()
+    if n == 0:
+        return 0.0
+    
+    A = nx.to_numpy_array(G)
+    eigenvalues = np.linalg.eigvalsh(A)  # más eficiente y exacto para matrices simétricas
+    energia = np.sum(np.abs(eigenvalues))
+    return energia / (n ** 1.5)
+
+
 
 def normalized_triangles(G):
     t = sum(nx.triangles(G).values()) / 3
@@ -54,12 +68,17 @@ def f_edges_normalized(G):
     m = G.number_of_edges()
     return 2 * m / (n * (n - 1)) if n > 1 else 0.0
 
+import networkx as nx
+
+def calcular_pearson_grados(G):
+    return nx.degree_pearson_correlation_coefficient(G)
+
 
 AVAILABLE_STATS = {
     "f1": modularity,
     "f2": normalized_triangles,
-    "f3": common_neighbor_density,
-    "f4": log_avg_degree,
+    "f3": calcular_pearson_grados,
+    "f4": energia_normalizada,
     "f5": f_edges_normalized
 }
 

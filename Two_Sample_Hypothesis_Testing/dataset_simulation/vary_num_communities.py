@@ -40,7 +40,7 @@ def save_graph(G, metadata, folder, idx):
 
 
 def generate_dataset_for_n(n, num_graphs=50):
-    possible_ms = [1, 2, 3, 4, 6, 8, 10, 12, 15, 18, 20, 25, 30, 35, 40, 50]
+    possible_ms = [1, 2, 3, 4, 6, 8, 10, 12, 15, 18, 21, 24, 28, 32, 36, 40, 45, 50, 55, 60, 66, 72, 78, 84, 91, 98, 105, 112, 120, 128]
     folder = f"data/vary_num_communities/n{n}"
     for i in tqdm(range(num_graphs)):
         m = np.random.choice(possible_ms)
@@ -50,5 +50,5 @@ def generate_dataset_for_n(n, num_graphs=50):
 
 
 if __name__ == "__main__":
-    for n in [100, 500, 1000]:
+    for n in [2000]:
         generate_dataset_for_n(n)
